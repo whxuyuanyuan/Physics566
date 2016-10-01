@@ -1,0 +1,186 @@
+\documentclass[a4paper]{article}
+\usepackage{amsmath}
+\usepackage{hyperref}
+\usepackage{nccmath}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{enumitem}
+\usepackage{float}
+\usepackage[english]{babel}
+\topmargin 0.0cm
+\oddsidemargin 0.2cm
+\textwidth 16cm 
+\textheight 21cm
+\footskip 1.0cm
+\title{\textbf{PHY566 Homework \#3}}
+\author{Yuanyuan Xu}
+
+\begin{document}
+	\maketitle
+	\centerline{\emph{\Large{Golf}}}
+	\section{Problem Description}
+	The Euler method can be generalized to deal with motion in two spatial dimensions. Assume we have a golf ball of mass 46 grams and use computer to calculate the trajectories as a function of angle (use $\theta = 45^{\circ}$, $30^{\circ}$, $15^{\circ}$ and $9^{\circ}$). Set the initial velocity of the golf to be 70 m/s and assume the drag taking the form of
+	\begin{equation} \label{drag}
+		F_{drag} = - C \rho A v^2,
+	\end{equation}
+	where $\rho$ is the density of air (at sea level), 1.29 kg/$\textrm{m}^3$, $A$ is the frontal area of the golf ball, $0.0014\textrm{m}^2$, and $C$ is the drag coefficient. In particular we will consider the following cases and compare their trajectories:
+	\begin{enumerate}[label=\alph*)]
+		\item ideal trajectory: no drag and no spin;
+		\item smooth golf ball with drag: choose $C = 1 / 2$;
+		\item dimpled golf ball with drag: choose $C = 1 / 2$ for speeds up to $v = 14 \textrm{~m/s	}$ and $C = 7.0 / v$ at higher velocities. This transition to a reduced drag coefficient is due to turbulent flow, caused by the dimples;
+		\item dimpled golf ball with drag and spin: use a Magnus force $\vec{F} = S_0 \vec{\omega} \times \vec{v}$ with a backspin of $S_0 \omega / m = 0.25 ~s^{-1}$ for a typical case.
+	\end{enumerate}
+	
+	\section{Solution}
+	\subsection{Ideal Case}
+	If we do not consider the air resistance and Magnus force, we can derive the equations of motion from the Newton's law:
+	\begin{equation}
+		\Sigma F_i = mg,
+	\end{equation}
+	where gravity is the only force acting on the golf ball.
+	Then, we can get two differential equations in x and y direction respectively,
+	\begin{align}
+		m\ddot{x} &= 0 \\
+		m\ddot{y} &= mg. \nonumber 
+	\end{align}
+	Substituting $\dot{x} = v_x$ and $\dot{y} = v_y$ into the above equations, we can obtain
+	\begin{align} 
+		\frac{dv_x}{dt} &= 0 \\
+		\frac{dv_y}{dt} &= -g\nonumber \\
+		\frac{dx}{dt} &= v_x\nonumber  \\
+		\frac{dy}{dt} &= v_y.\nonumber 
+	\end{align}
+	Then, we can use the Euler's method to calculate the trajectory with the above first-order differential equations
+	\begin{align} \label{ideal}
+		x(t + \Delta t) &= x(t) + v_x(t)\cdot\Delta t \\
+		v_x (t + \Delta t) &= v_x(t)\nonumber  \\
+		y(t + \Delta t) &= y(t) + v_y(t)\cdot\Delta t\nonumber \\
+		v_y(t + \Delta t) &= v_y(t) - g\cdot \Delta t. \nonumber 
+	\end{align}
+	
+	\subsection{Air Resistance}
+	Air resistance or aerodynamic drag is the force due to the golf ball's interaction with air molecular and it can be calculated using \eqref{drag} and the components of the drag can be written  as,
+	\begin{align}
+		\vec{F}_{\textrm{drag}, x} &= - C\rho A |v|\vec{v_x}\\
+		\vec{F}_{\textrm{drag}, y} &= - C\rho A |v|\vec{v_y}\nonumber 
+	\end{align}
+	Then, for a smooth ball, we can modified the equations of motion as
+	\begin{align}
+		m\ddot{x} &= F_{\textrm{drag}, x} = - C\rho A |v|v_x\\
+		m\ddot{y} &= mg + F_{\textrm{drag}, y} = - C\rho A |v|v_y.\nonumber 
+	\end{align}
+	Adding this force to \eqref{ideal}) leads to
+	\begin{align}
+		x(t + \Delta t) &= x(t) + v_x(t)\cdot\Delta t \\
+		v_x (t + \Delta t) &= v_x(t) - \frac{C\rho A |v|v_x(t)  \nonumber}{m}\Delta t \\
+		y(t + \Delta t) &= y(t) + v_y(t)\cdot\Delta t \nonumber \\
+		v_y(t + \Delta t) &= v_y(t) - g\cdot \Delta t - \frac{C\rho A |v|v_y(t)}{m}\Delta t.\nonumber 		
+	\end{align}
+	
+	\subsection{Spin}
+	If we consider the effects of spin, we have to introduce the Magnus force. Suppose we have a ball moving to the left and rotating about its axis in an anticlockwise direction. Because of the spin, the bottom surface of the ball will have a larger velocity relative to the air than will the top surface of the ball. This will result in a larger drag force on the bottom part. This drag force will have a component that lifts the ball, which is called the Magnus force. If the angular velocity of the ball is $\omega$, the speed of the ball is $v$, and the radius is $r$, then the Magnus force is proportional to the difference of the square of the airflow velocity over the surface of the ball, 
+	\begin{equation}
+		F_M \propto (v + r\omega)^2 - (v- r\omega)^2 \sim vr\omega.
+	\end{equation} 
+	Thus the net spin-dependent force have the general form
+	\begin{equation}
+		\vec{F}_M = S_0(\vec{w} \times \vec{v}),
+	\end{equation}
+	where $S_0$ is a coefficient taking care of averaging the drag force over the surface of the ball.
+	
+	Then, the equations of motion for the golf ball are
+	\begin{align}
+		\frac{dv_x}{dt} &= - \frac{F_{\mathrm{drag}, x}}{m} - \frac{S_0 \omega v_y}{m} \\
+		\frac{dv_y}{dt} &= - \frac{F_{\mathrm{drag}, y}}{m} + \frac{S_0 \omega v_x}{m}. \nonumber
+	\end{align}
+	And we can get the general equations of motion by the Euler's method
+	\begin{align} \label{general}
+		x(t + \Delta t) &= x(t) + v_x(t)\cdot\Delta t \\
+		v_x (t + \Delta t) &= v_x(t) - \frac{C\rho A |v|v_x(t)  \nonumber}{m}\Delta t - \frac{S_0 \omega v_y(t)}{m}\Delta t \\
+		y(t + \Delta t) &= y(t) + v_y(t)\cdot\Delta t \nonumber \\
+		v_y(t + \Delta t) &= v_y(t) - g\cdot \Delta t - \frac{C\rho A |v|v_y(t)}{m}\Delta t + \frac{S_0 \omega v_x(t)}{m}\Delta t.\nonumber 			
+	\end{align}
+	
+	\subsection{Turbulence}
+	In reality, a golf ball has dimples. They cause the transition to turbulent flow to occur at very low velocities, with a corresponding drop in the drag coefficient. 
+	
+	\subsection{General solution}
+	In general, we can use \eqref{general} ~to calculate the trajectories for different cases:
+	\begin{enumerate}[label=\alph*)]
+		\item $C = 0, S_0 = 0$;
+		\item $C = 1/2, 	S_0 = 0$;
+		\item 
+		\begin{fleqn}[0pt]
+			\begin{equation*}
+				C = \begin{cases}
+ 					1/2 & \text{if } v \leq 14\mathrm{~m/s}, \\
+ 					7/ 14 & \text{if } v > 14\mathrm{~m/s}.
+ 				\end{cases}
+			\end{equation*}
+			\begin{equation*}
+				S_0 = 0.	
+			\end{equation*}
+		\end{fleqn}
+		\item
+		\begin{fleqn}[0pt]
+			\begin{equation*}
+				C = \begin{cases}
+ 					1/2 & \text{if } v \leq 14\mathrm{~m/s}, \\
+ 					7/ 14 & \text{if } v > 14\mathrm{~m/s}.
+ 				\end{cases}
+			\end{equation*}
+			\begin{equation*}
+				S_0\omega / m = 0.25 \text{ s}^{-1}.	
+			\end{equation*}
+		\end{fleqn}
+	\end{enumerate}
+	
+	\newpage
+	\section{Results}
+	\begin{figure}[H]
+		\centering
+		\includegraphics[width=0.75\linewidth]{ideal}
+		\caption{Case a}
+		\label{a}
+		\includegraphics[width=0.75\linewidth]{smooth_drag}
+		\caption{Case b}
+		\label{b}
+	\end{figure}
+	\newpage
+	\begin{figure}[H]
+		\centering
+		\includegraphics[width=0.75\linewidth]{dimpled_drag}
+		\caption{Case c}
+		\label{c}
+		\includegraphics[width=0.75\linewidth]{dimpled_drag_spin}
+		\caption{Case d}
+		\label{d}
+	\end{figure}
+	
+	\newpage
+	\section{Comparison}	
+	\begin{figure}[H]
+		\centering
+		\includegraphics[width=0.75\linewidth]{theta=45}
+		\caption{$\theta = 45^{\circ}$}
+		\label{e}
+		\includegraphics[width=0.75\linewidth]{theta=30}
+		\caption{$\theta = 30^{\circ}$}
+		\label{f}
+	\end{figure}
+	\newpage
+	\begin{figure}[H]
+		\centering
+		\includegraphics[width=0.75\linewidth]{theta=15}
+		\caption{$\theta = 15^{\circ}$}
+		\label{g}
+		\includegraphics[width=0.75\linewidth]{theta=9}
+		\caption{$\theta = 9^{\circ}$}
+		\label{h}
+	\end{figure}	
+	\newpage
+	
+	\section{Discussion}
+	Figure~\ref{a} shows the parabolic motion of an ideal golf ball. From figure~\ref{b} and ~\ref{c}, we can see that the trajectory with $\theta = 30^{\circ}$ has the largest range. Figure~\ref{d} shows that the trajectory before reaching the highest point is an upward-sloping curve and this is due to the effects of turbulent flow. If we compare the trajectories of various cases with the same angle, we can find that the dimpled ball flies almost twice the distance of the smooth ball with air resistance, which is the reason why a golf has dimples. If we introduce the Magnus force, we can easily find that the cyan solid curve has the highest point in each figure and it can even reach more than 200 m in figure~\ref{h}. We can conclude that drag, spin, and turbulence all play a key role in the motion of a golf ball in reality and the shape of the golf ball is based on the scientific principles.
+\end{document}

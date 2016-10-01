@@ -1,0 +1,461 @@
+\documentclass[a4paper]{article}
+\usepackage{amsmath}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{enumitem}
+\usepackage{float}
+\usepackage[english]{babel}
+\topmargin 0.0cm
+\oddsidemargin 0.2cm
+\textwidth 16cm 
+\textheight 21cm
+\footskip 1.0cm
+\title{\textbf{PHY566 Homework \#4}}
+\author{Yuanyuan Xu}
+
+\begin{document}
+	\maketitle
+	\centerline{\emph{\Large{Oscillatory Motion and Chaos}}}
+	\tableofcontents
+	\newpage
+	\section{Problem Description}
+	A damped, sinusoidally driven pendulum can be described by the following equation of motion
+	\begin{equation}
+		\frac{d^2 \theta}{dt^2} = - \frac{g}{l}\theta - 2\gamma \frac{d\theta}{dt} + {\alpha}_D \sin({\Omega}_D t),
+	\end{equation}
+	where $l$ is the length of the pendulum, $2\gamma$ is the damping ratio, $\alpha _D$ is the amplitude of driving force, and $\Omega _D$ is the frequency of driving force. In this problem, we use $g = 9.8 \mathrm{~m/s^2}, l = 9.8 \mathrm{~m}, \gamma = 0.25 \mathrm{~s^{-1}}$ and $\alpha _D = 0.2 \mathrm{~rad/s^2}$. 
+	
+	Analytically, we will calculate the value of $\Omega _D$ when the resonance occurs. Then we will use two numerically methods (Euler-Cromer method and Runge-Kutta method respectively) to calculate the solve Eq.~\eqref{eom}. We will also study the resonance structure (amplitude and phase shift) by using the Runge-Kutta method. For a driving frequency close to resonance, we will compute the potential, kinetic, and total energies of the pendulum. Then we will consider the nonlinear effect by replacing $\theta$ with $\sin\theta$ in the restoring force. At last, will compute $|\Delta\theta(t)|$ for several trajectories and estimate the Lyapunov exponent $\lambda$.
+	\section{Analytic Solution} \label{analytically solution}
+	The equation of motion is 
+	\begin{equation} \label{eom}
+		\frac{d^2 \theta}{dt^2} = - \frac{g}{l}\theta - 2\gamma \frac{d\theta}{dt} + {\alpha}_D \sin({\Omega}_D t).
+	\end{equation}
+	The steady solution is 
+	\begin{equation}
+		\theta(t) = {\theta}_0 \sin({\Omega}_D t + \phi),
+	\end{equation}
+	where the amplitude ${\theta}_0$ is given by
+	\begin{equation}
+		{\theta}_0 = \frac{{\alpha}_D}{\sqrt{({\Omega}^2 - {\Omega}_D^2)^2 + (2\gamma{\Omega}_D)^2}},
+	\end{equation}
+	where $\Omega = \sqrt{\frac{g}{l}}$. 
+	
+	
+	The resonance occurs when the amplitude ${\theta}_0$ is very large. Now, we consider the function
+	\begin{equation}
+		f(x) = (a - x^2)^2 + (bx)^2,
+	\end{equation}
+	where $a$ and $b$ are both positive. And its derivative is
+	\begin{equation}
+		f^\prime(x) = 2x [2x^2 + b^2 - 2a].
+	\end{equation}
+	Therefore, $f(x)$ has only one positive stationary points
+	\begin{equation} 
+		x^{*} = \sqrt{\frac{2a - b^2}{2}}.
+	\end{equation} 
+	We can also find that
+	\begin{equation}
+		f^{\prime\prime}(x^*) > 0.
+	\end{equation}
+	Hence, $f(x)$ has a minima point at $x^*$. If we let $a = {\Omega}^2$ and $b = 2\gamma$, we can obtain
+	\begin{equation}
+		{{\Omega}_{D}}_\mathrm{resonance} = \sqrt{{\Omega}^2 - 2{\gamma}^2}.
+	\end{equation}
+	If we substitute the known values, we can get
+	\begin{equation} \label{as}
+		{{\Omega}_{D}}_\mathrm{resonance} = \sqrt{\frac{g}{l} - 2{\gamma}^2} \approx 0.9354 \mathrm{~s^{-1}} 
+	\end{equation}
+	
+	The small-angle approximation is good for small angles. Because $\sin\theta = \theta - \frac{{\theta}^3}{6} + O(x^5)$ by Taylor expansion and $\sin\theta = \theta$ is very accurate for $\theta < 15^{\circ}$. However, for the driven pendulum, the angle can be very large due to the driven force. Hence, the small-angle approximation is not suitable to solve the differential equation of the driven pendulum.
+
+	\section{Numerical Solution}
+	Firstly, we will rewrite Eq.~\eqref{eom} as two first-order equations and obtain
+	\begin{align} \label{diff} 
+		\frac{d\omega}{dt} &= -\frac{g}{l}\theta - 2\gamma\frac{d\theta}{dt} + \alpha _D\sin(\Omega _D t) \\
+		\frac{d\theta}{dt} &= \omega. \nonumber
+	\end{align}
+	Then, we can use two methods to calculate the above equations.
+	\subsection{Euler-Cromer Method}
+	Eq.~\eqref{diff} can be converted into difference equations for $theta _i$ and $\omega _i$ as the following equations
+	\begin{align}
+		\omega _{i+1} &= \omega _i + [-\frac{g}{l}\theta _i - 2\gamma \omega _i  + \alpha _D \sin(\Omega _D t_i)]\Delta t, \\
+		\theta _{i+1} &= \theta _i + \omega _{i+1}\Delta t, \nonumber \\
+		t_{i+1} &= t_i + \Delta t. \nonumber
+	\end{align}
+	If $\theta _i$ is out of the range $[-\pi, \pi]$, add or subtract $2\pi$ to keep it in this range.
+	\subsection{Runge-Kutta Method}
+	Eq.~\eqref{diff} can also be converted by the 4th order Runge-Kutta method as the follow equations
+	\begin{align}
+		\omega _{i+1} &= \omega _i + \frac{1}{6}[f(\theta _i, \omega _1^{\prime}, t_1^{\prime}) + 2f(\theta _i, \omega _2^{\prime}, t_2^{\prime}) + 2f(\theta _i, \omega _3^{\prime}, t_3^{\prime}) + f(\theta _i, \omega _4^{\prime}, t_4^{\prime})], \\
+		\theta _{i+1} &= \theta _i + \omega _i \Delta t, \nonumber
+	\end{align}
+	where,
+	\begin{equation*}
+		f(\theta, \omega, t) = -\frac{g}{l}\theta - 2\gamma\omega + \alpha _D\sin(\Omega _D t),	
+	\end{equation*}
+	and
+	\begin{align*}
+		\omega _1^{\prime} &= \omega _i, \mathrm{~}t _1^{\prime} = t,\\
+		\omega _2^{\prime} &= \omega _i + \frac{1}{2}f(\theta _i, \omega _1^{\prime}, t_1^{\prime})\Delta t , \mathrm{~}t _2^{\prime} = t + \frac{1}{2}\Delta t,\\
+		\omega _3^{\prime} &= \omega _i + \frac{1}{2}f(\theta _i, \omega _2^{\prime}, t_2^{\prime})\Delta t , \mathrm{~}t _3^{\prime} = t + \frac{1}{2}\Delta t,\\
+		\omega _2^{\prime} &= \omega _i + \frac{1}{2}f(\theta _i, \omega _3^{\prime}, t_3^{\prime})\Delta t , \mathrm{~}t _4^{\prime} = t + \Delta t.\\
+	\end{align*}
+	If $\theta _i$ is out of the range $[-\pi, \pi]$, add or subtract $2\pi$ to keep it in this range.
+	\subsection{Resonance Curve}
+	After a sufficient long time, the solution of Eq.~\eqref{eom} is
+	\begin{equation}
+		\theta(t) = \theta _0 \sin(\Omega _D + \phi),
+	\end{equation}
+	where $\theta _0$ is the amplitude and $\phi$ is the phase shift.
+	We can use sinusoidal function to fit the curve after a long time. Then we can plot $\theta _0$ vs. $\Omega_D$ and $\phi$ vs. $\Omega _D$. 
+	
+	We can use the function \textbf{scipy.optimize.curve\_fit} to fit curve. I extract the last $1/5$ of the data and use $f(x) = |a|\sin(bx + c)$ as the model function. We can estimate the accuracy by calculating the total standard deviation errors
+	\begin{equation}
+		\sum\sigma _i = \mathrm{np.sum(np.sqrt(np.diag(}pcov\mathrm{)))},
+	\end{equation}
+	where $prov$ is one of the returns from \textbf{curve\_fit}.
+	If the total deviation errors are big, then we can fine tune the inital guess and refit the curve utill $\sum\sigma _i < 10 ^{-2}$.
+	\subsection{Energy}
+	The total energy of the pendulum is given by
+	\begin{equation}
+		E = \frac{1}{2}ml^{2}\omega ^{2} + mgl(1 - \cos \theta).
+	\end{equation}
+	The first term is the kinetic energy and the second term is the potential energy. In the limit of small $\theta$, the energy reduces to
+	\begin{equation}
+		E = \frac{1}{2}ml^{2}\omega ^{2} + mgl\theta ^{2}.
+	\end{equation}
+	Then, we can get the kinetic energy, potential energy and total energy for each step
+	\begin{align}
+		T_i &= \frac{1}{2}l^{2}{\omega}_i ^{2},\\
+		V_i &= gl\theta _i ^{2}, \nonumber \\
+		E_i &= T_i + V_i. \nonumber
+	\end{align}
+	Note the above equations give us the energy per unit mass since we do not know the mass of the pendulum.
+	\subsection{Lyapunov Exponent} 
+	If we consider the nonlinear effects, we should replace $\theta$ with $\sin\theta$ in Eq.~\eqref{eom}. Then, the equation of motion is 
+	\begin{equation} \label{new}
+		\frac{d^2 \theta}{dt^2} = - \frac{g}{l}\sin\theta - 2\gamma \frac{d\theta}{dt} + {\alpha}_D \sin({\Omega}_D t).
+	\end{equation}
+	We can use Eq.~\eqref{new} to investigate stability of solutions by running identical pendulum with 2 slightly different initial conditions $\theta _1$ and $\theta _2$. And then plot $\Delta\theta = |\theta _1 - \theta _2|$ vs. time (use initial~$\Delta \theta _{\mathrm{in}} \approx 0.001$). When plotting $\Delta \theta$ vs. time on semi-log scale, we can observe either on average	 an exponential fall off or exponential rise, which implies
+	\begin{equation}
+		\Delta \theta \approx e^{\lambda t},
+	\end{equation}
+	where the parameter $\lambda$ is known as a Lyapunov exponent. 
+	\begin{enumerate}[label=\alph*)]
+		\item $\lambda > 0$: non-chaotic regime. The system is insensitive to variation in initial condition.
+		\item $\lambda < 0$: chaotic regime. Trajectories for similar initial conditions diverge very fast, behavior of systems becomes unpredictable.
+		\item $\lambda = 0$: transition point.
+	\end{enumerate}
+	We can use $f(t) = \lambda t + c$ to fit the semi-log figure.
+ 	\newpage
+ 	
+ 	\section{Results}
+ 	\subsection{Part a}
+ 	See the last part of section \ref{analytically solution}.
+ 	\subsection{Part b}\label{partb}
+ 	The following three figures show the comparison between Euler-Cromer method and Runge-Kutta method. As can be seen from the figure, both $\theta(t)$ and $\omega(t)$ reach the steady states after a sufficiently long time.
+ 	\begin{figure}[H]
+		\centering
+		\includegraphics[width=0.75\linewidth]{comparison_1}
+		\caption{$\Omega_D = 0.5 \mathrm{~s^{-1}}$}
+		\label{a}
+		\includegraphics[width=0.75\linewidth]{comparison_2}
+		\caption{$\Omega_D = 1.0 \mathrm{~s^{-1}}$}
+		\label{b}
+	\end{figure}
+	\newpage
+	 \begin{figure}[H]
+		\centering
+		\includegraphics[width=0.75\linewidth]{comparison_3}
+		\caption{$\Omega_D = 1.5 \mathrm{~s^{-1}}$}
+		\label{c}
+	\end{figure}
+	
+	Then I extracted 50 sets of data from different driving frequencies in the range of $[0.1, 1.5]$ and plotted the following resonance curve.
+	 \begin{figure}[H]
+		\centering
+		\includegraphics[width=0.75\linewidth]{resonance_curve}
+		\caption{Resonance curve}
+		\label{res}
+	\end{figure}
+	
+	The following figure shows the resonance curve with full width at half maximum (FWHM)).
+	\begin{figure}[H]
+		\centering
+		\includegraphics[width=0.75\linewidth]{FWHM}
+		\caption{FWHM}
+		\label{FWHM}
+	\end{figure}
+	As can be seen from the figure, the red line represents the FWHM and we can calculate its value
+	\begin{equation}
+		\Delta\Omega _D \approx 1.114 \mathrm{~s^{-1}}.
+	\end{equation}
+	Compared with $\gamma$, we can find
+	\begin{equation}
+		\Delta\Omega _D > 2\gamma.
+	\end{equation}
+	\subsection{Part c}
+	\begin{figure}[H]
+		\centering
+		\includegraphics[width=0.75\linewidth]{energy}
+		\caption{$\Omega_D = 0.93 \mathrm{~s^{-1}}$, $\theta(0) = 0.3\mathrm{~rad}$, $\omega(0) = 0.4 \mathrm{~rad/s^2}$.}
+		\label{energy}
+	\end{figure}
+	\subsection{Part d}	\label{partd}
+	If we switch on the nonlinear effect, we can see the comparison plots for $\theta(t)$ and $\omega(t)$ from the following figures.
+	 \begin{figure}[H]
+		\centering
+		\includegraphics[width=0.95\linewidth]{part_d_comparison_theta}
+		\caption{$\Omega_D = 0.93 \mathrm{~s^{-1}}$, $\theta(0) = 0.3\mathrm{~rad}$, $\omega(0) = 0.4 \mathrm{~rad/s^2}$.}
+		\label{theta}
+		\includegraphics[width=0.95\linewidth]{part_d_comparison_omega}
+		\caption{$\Omega_D = 0.93 \mathrm{~s^{-1}}$, $\theta(0) = 0.3\mathrm{~rad}$, $\omega(0) = 0.4 \mathrm{~rad/s^2}$.}
+		\label{omega}
+	\end{figure}
+	\newpage
+	Now, if we increase $\alpha _D$ to $1.2 \mathrm{rad/s^2}$, we can get
+	 \begin{figure}[H]
+		\centering
+		\includegraphics[width=0.95\linewidth]{part_d_new_theta}
+		\caption{$\Omega_D = 0.93 \mathrm{~s^{-1}}$, $\alpha_D = 1.2 \mathrm{~rad/s^2}$， $\theta(0) = 0.3\mathrm{~rad}$, $\omega(0) = 0.4 \mathrm{~rad/s^2}$.}
+		\label{newtheta}
+		\includegraphics[width=0.95\linewidth]{part_d_new_omega}
+		\caption{$\Omega_D = 0.93 \mathrm{~s^{-1}}$, $\alpha_D = 1.2 \mathrm{~rad/s^2}$, $\theta(0) = 0.3\mathrm{~rad}$, $\omega(0) = 0.4 \mathrm{~rad/s^2}$.}
+		\label{newomega}
+	\end{figure}
+	\newpage
+	\subsection{Part e} \label{parte}
+	In this section, we will study the behavior of two identical pendulums with slightly different initial conditions. For the following figures in this section, I used the nonlinear pendulum with $\Omega _D = 0.666\mathrm{~s^{-1}}$ and $\alpha _D = 0.2$, $0.5$ and $1.2\mathrm{~rad/s^2}$.
+	\subsubsection{$\alpha _D = 0.2\mathrm{~rad/s^2}$}
+	\begin{figure}[H]
+		\centering
+		\begin{subfigure}{0.85\textwidth}
+		\includegraphics[width=1\linewidth]{trajectory_0.2_1.eps}
+		\caption{Trajectory}	
+		\end{subfigure}
+		\begin{subfigure}{0.85\textwidth}
+		\includegraphics[width=1\linewidth]{lyapunov_0.2_1.eps}
+		\caption{$|\Delta\theta(t)|$}	
+		\end{subfigure}
+		\caption{$\Delta\theta_{\mathrm{in}} = 0.0009\mathrm{~rad}$}
+	\end{figure}
+	\newpage
+	\begin{figure}[H]
+		\centering
+		\begin{subfigure}{0.85\textwidth}
+		\includegraphics[width=1\linewidth]{trajectory_0.2_2.eps}
+		\caption{Trajectory}	
+		\end{subfigure}
+		\begin{subfigure}{0.85\textwidth}
+		\includegraphics[width=1\linewidth]{lyapunov_0.2_2.eps}
+		\caption{$|\Delta\theta(t)|$}	
+		\end{subfigure}
+		\caption{$\Delta\theta_{\mathrm{in}} = 0.0010\mathrm{~rad}$}
+	\end{figure}
+	\newpage
+	\begin{figure}[H]
+		\centering
+		\begin{subfigure}{0.85\textwidth}
+		\includegraphics[width=1\linewidth]{trajectory_0.2_3.eps}
+		\caption{Trajectory}	
+		\end{subfigure}
+		\begin{subfigure}{0.85\textwidth}
+		\includegraphics[width=1\linewidth]{lyapunov_0.2_3.eps}
+		\caption{$|\Delta\theta(t)|$}	
+		\end{subfigure}
+		\caption{$\Delta\theta_{\mathrm{in}} = 0.0011\mathrm{~rad}$}
+	\end{figure}
+	From the above three figures, we can obtain $\lambda = -0.24909$.
+	\newpage
+	\subsubsection{$\alpha _D = 0.5\mathrm{~rad/s^2}$}
+	\begin{figure}[H]
+		\centering
+		\begin{subfigure}{0.85\textwidth}
+		\includegraphics[width=1\linewidth]{trajectory_0.5_1.eps}
+		\caption{Trajectory}	
+		\end{subfigure}
+		\begin{subfigure}{0.85\textwidth}
+		\includegraphics[width=1\linewidth]{lyapunov_0.5_1.eps}
+		\caption{$|\Delta\theta(t)|$}	
+		\end{subfigure}
+		\caption{$\Delta\theta_{\mathrm{in}} = 0.0009\mathrm{~rad}$}
+	\end{figure}
+	\newpage
+	\begin{figure}[H]
+		\centering
+		\begin{subfigure}{0.85\textwidth}
+		\includegraphics[width=1\linewidth]{trajectory_0.5_2.eps}
+		\caption{Trajectory}	
+		\end{subfigure}
+		\begin{subfigure}{0.85\textwidth}
+		\includegraphics[width=1\linewidth]{lyapunov_0.5_2.eps}
+		\caption{$|\Delta\theta(t)|$}	
+		\end{subfigure}
+		\caption{$\Delta\theta_{\mathrm{in}} = 0.0010\mathrm{~rad}$}
+	\end{figure}
+	\newpage
+	\begin{figure}[H]
+		\centering
+		\begin{subfigure}{0.85\textwidth}
+		\includegraphics[width=1\linewidth]{trajectory_0.5_3.eps}
+		\caption{Trajectory}	
+		\end{subfigure}
+		\begin{subfigure}{0.85\textwidth}
+		\includegraphics[width=1\linewidth]{lyapunov_0.5_3.eps}
+		\caption{$|\Delta\theta(t)|$}	
+		\end{subfigure}
+		\caption{$\Delta\theta_{\mathrm{in}} = 0.0011\mathrm{~rad}$}
+	\end{figure}
+	From the above three figures, we can obtain $\lambda = -0.24973$.
+	\newpage
+	\subsubsection{$\alpha _D = 1.2\mathrm{~rad/s^2}$}
+	\begin{figure}[H]
+		\centering
+		\begin{subfigure}{0.85\textwidth}
+		\includegraphics[width=1\linewidth]{trajectory_1.2_1.eps}
+		\caption{Trajectory}	
+		\end{subfigure}
+		\begin{subfigure}{0.85\textwidth}
+		\includegraphics[width=1\linewidth]{lyapunov_1.2_1.eps}
+		\caption{$|\Delta\theta(t)|$}	
+		\end{subfigure}
+		\caption{$\Delta\theta_{\mathrm{in}} = 0.00090\mathrm{~rad}$}
+	\end{figure}
+	\newpage
+	\begin{figure}[H]
+		\centering
+		\begin{subfigure}{0.85\textwidth}
+		\includegraphics[width=1\linewidth]{trajectory_1.2_2.eps}
+		\caption{Trajectory}	
+		\end{subfigure}
+		\begin{subfigure}{0.85\textwidth}
+		\includegraphics[width=1\linewidth]{lyapunov_1.2_2.eps}
+		\caption{$|\Delta\theta(t)|$}	
+		\end{subfigure}
+		\caption{$\Delta\theta_{\mathrm{in}} = 0.00092\mathrm{~rad}$}
+	\end{figure}
+	\newpage
+	\begin{figure}[H]
+		\centering
+		\begin{subfigure}{0.85\textwidth}
+		\includegraphics[width=1\linewidth]{trajectory_1.2_3.eps}
+		\caption{Trajectory}	
+		\end{subfigure}
+		\begin{subfigure}{0.85\textwidth}
+		\includegraphics[width=1\linewidth]{lyapunov_1.2_3.eps}
+		\caption{$|\Delta\theta(t)|$}	
+		\end{subfigure}
+		\caption{$\Delta\theta_{\mathrm{in}} = 0.00094\mathrm{~rad}$}
+	\end{figure}
+	\newpage
+	\begin{figure}[H]
+		\centering
+		\begin{subfigure}{0.85\textwidth}
+		\includegraphics[width=1\linewidth]{trajectory_1.2_4.eps}
+		\caption{Trajectory}	
+		\end{subfigure}
+		\begin{subfigure}{0.85\textwidth}
+		\includegraphics[width=1\linewidth]{lyapunov_1.2_4.eps}
+		\caption{$|\Delta\theta(t)|$}	
+		\end{subfigure}
+		\caption{$\Delta\theta_{\mathrm{in}} = 0.00096\mathrm{~rad}$}
+	\end{figure}
+	\newpage
+	\begin{figure}[H]
+		\centering
+		\begin{subfigure}{0.85\textwidth}
+		\includegraphics[width=1\linewidth]{trajectory_1.2_5.eps}
+		\caption{Trajectory}	
+		\end{subfigure}
+		\begin{subfigure}{0.85\textwidth}
+		\includegraphics[width=1\linewidth]{lyapunov_1.2_5.eps}
+		\caption{$|\Delta\theta(t)|$}	
+		\end{subfigure}
+		\caption{$\Delta\theta_{\mathrm{in}} = 0.00098\mathrm{~rad}$}
+	\end{figure}
+	\newpage
+	\begin{figure}[H]
+		\centering
+		\begin{subfigure}{0.85\textwidth}
+		\includegraphics[width=1\linewidth]{trajectory_1.2_6.eps}
+		\caption{Trajectory}	
+		\end{subfigure}
+		\begin{subfigure}{0.85\textwidth}
+		\includegraphics[width=1\linewidth]{lyapunov_1.2_6.eps}
+		\caption{$|\Delta\theta(t)|$}	
+		\end{subfigure}
+		\caption{$\Delta\theta_{\mathrm{in}} = 0.00100\mathrm{~rad}$}
+	\end{figure}
+	\newpage
+	\begin{figure}[H]
+		\centering
+		\begin{subfigure}{0.85\textwidth}
+		\includegraphics[width=1\linewidth]{trajectory_1.2_7.eps}
+		\caption{Trajectory}	
+		\end{subfigure}
+		\begin{subfigure}{0.85\textwidth}
+		\includegraphics[width=1\linewidth]{lyapunov_1.2_7.eps}
+		\caption{$|\Delta\theta(t)|$}	
+		\end{subfigure}
+		\caption{$\Delta\theta_{\mathrm{in}} = 0.00102\mathrm{~rad}$}
+	\end{figure}
+	\newpage
+	\begin{figure}[H]
+		\centering
+		\begin{subfigure}{0.85\textwidth}
+		\includegraphics[width=1\linewidth]{trajectory_1.2_8.eps}
+		\caption{Trajectory}	
+		\end{subfigure}
+		\begin{subfigure}{0.85\textwidth}
+		\includegraphics[width=1\linewidth]{lyapunov_1.2_8.eps}
+		\caption{$|\Delta\theta(t)|$}	
+		\end{subfigure}
+		\caption{$\Delta\theta_{\mathrm{in}} = 0.00104\mathrm{~rad}$}
+	\end{figure}
+	\newpage
+	\begin{figure}[H]
+		\centering
+		\begin{subfigure}{0.85\textwidth}
+		\includegraphics[width=1\linewidth]{trajectory_1.2_9.eps}
+		\caption{Trajectory}	
+		\end{subfigure}
+		\begin{subfigure}{0.85\textwidth}
+		\includegraphics[width=1\linewidth]{lyapunov_1.2_9.eps}
+		\caption{$|\Delta\theta(t)|$}	
+		\end{subfigure}
+		\caption{$\Delta\theta_{\mathrm{in}} = 0.00106\mathrm{~rad}$}
+	\end{figure}
+	\newpage
+	\begin{figure}[H]
+		\centering
+		\begin{subfigure}{0.85\textwidth}
+		\includegraphics[width=1\linewidth]{trajectory_1.2_10.eps}
+		\caption{Trajectory}	
+		\end{subfigure}
+		\begin{subfigure}{0.85\textwidth}
+		\includegraphics[width=1\linewidth]{lyapunov_1.2_10.eps}
+		\caption{$|\Delta\theta(t)|$}	
+		\end{subfigure}
+		\caption{$\Delta\theta_{\mathrm{in}} = 0.00108\mathrm{~rad}$}
+	\end{figure}
+	\newpage
+	\begin{figure}[H]
+		\centering
+		\begin{subfigure}{0.85\textwidth}
+		\includegraphics[width=1\linewidth]{trajectory_1.2_11.eps}
+		\caption{Trajectory}	
+		\end{subfigure}
+		\begin{subfigure}{0.85\textwidth}
+		\includegraphics[width=1\linewidth]{lyapunov_1.2_11.eps}
+		\caption{$|\Delta\theta(t)|$}	
+		\end{subfigure}
+		\caption{$\Delta\theta_{\mathrm{in}} = 0.00110\mathrm{~rad}$}
+	\end{figure}
+	From the above 11 figures, we can obtain $\lambda = 0.08275$.
+	\newpage
+	\section{Discussion}
+	From section~\ref{partb}, we can see that the deviation between two methods is not big, i.e.\ we can use either one to solve the oscillatory motion. Fig.~\ref{res} shows the resonance the curve and we can find that $\theta _0$ peaks at $\Omega _D = 0.935 \mathrm{~s^{-1}}$ which is the same as the analytic solution (Eq.~\eqref{as}). And the phase shift at the natural frequency $\Omega = \sqrt{\frac{g}{l}}$ is $-\frac{\pi}{2}$. In section~\ref{partd}, we can see the nonlinear effects, the deviation is obvious in Fig.~\ref{omega}. Since the angle is not big in the whole process, the result calculated by using small angle approximation is reliable. In section~\ref{parte}, we get positive Lyapunov exponents for both $\alpha _D = 0.2\mathrm{~rad/s^2}$ and $\alpha _D = 0.5\mathrm{~rad/s^2}$, which means that these two systems are not in the chaotic regime. And the figures of trajectory for these two cases show that the two pendulums with slightly different initial conditions follow almost the same trajectory. However, when we increase $\alpha_D$ to $1.5\mathrm{~rad/s^2}$, $\lambda$ becomes negative and that indicates the system is in the chaotic regime. And all of figures show that the trajectories of two pendulums separate after some time. Especially, the deviation is more obvious for larger $\Delta\theta _{\mathrm{in}}$. In total, the trajectories with $\alpha _D = 0.2\mathrm{~rad/s^2}$ and $\alpha _D = 0.5\mathrm{~rad/s^2}$ are predictable and the trajectories with $\alpha _D = 1.2\mathrm{~rad/s^2}$ are unpredictable.
+\end{document}

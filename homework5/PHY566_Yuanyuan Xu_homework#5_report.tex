@@ -1,0 +1,142 @@
+\documentclass[a4paper]{article}
+\usepackage{amsmath}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{enumitem}
+\usepackage{float}
+\usepackage[english]{babel}
+\topmargin 0.0cm
+\oddsidemargin 0.2cm
+\textwidth 16cm 
+\textheight 21cm
+\footskip 1.0cm
+\title{\textbf{PHY566 Homework \#5}}
+\author{Yuanyuan Xu}
+
+\begin{document}
+	\maketitle
+	\centerline{\emph{\Large{Random Numbers}}}
+	\section{Problem Description}
+	\begin{enumerate}[label=\alph*)]
+		\item Generate 1,000 and 1,000,000 random numbers evenly distributed between 0 and 1 respectively and plot the probability distribution of the generated random numbers with 10, 20, 50 and 100 subdivisions.	
+		\item Generate 1,000 and 1,000,000 random numbers distributed according to a Gaussian distribution with width $\sigma = 1.0$ respectively. The Gaussian distribution function is given by
+		$$
+			P(x) = \frac{1}{\sigma \sqrt{2\pi}}e^{-\frac{x^2}{2\sigma ^{2}}}
+		$$
+		Then plot the probability distribution of the generated random numbers with 10, 20, 50 and 100 subdivisions and verify the result by overlaying a Gaussian onto the plots.
+	\end{enumerate}
+	\newpage
+	\section{Numerical Methods}
+	\subsection{Random Number Generator}
+	We generally give up on truly random numbers, and use ``Pseudo-Random" sequences of numbers instead. One example of a pseudo-random generator is the linear congruential generator:
+	\begin{equation}
+		x_{n+1} = (ax_n + b) \mod c
+	\end{equation}
+	This pseudo-random number generator takes a ``seed" $x_0$ and generates a series of numbers which, depending on the choices of $a, b$, and $c$, can meet the necessary criteria for Monte Carlo techniques.
+	
+	Python comes with a pseudo-random number generator called the ``Merseinne Twister". This is a very fast generator, and it has been extensively tested by the mathematical community and given a clean bill of health. To access these random-number routines, import ``random'' package and \textbf{random.random()} will generate a random float between 0 and 1.
+	\subsection{Marsaglia Algorithm}
+	The Box-Muller algorithm has been improved by Marsaglia in a way that the use of trigonometric functions can be avoided. It is important, since computation of trigonometric functions is very time-consuming.
+	\begin{quote}
+		Algorithm: polar method (create $Z \sim \mathcal{N}(0, 1)$):
+		\begin{enumerate}
+			\item repeat generate $U_1, U_2 \sim \mathcal{U}[0,1]$; \\
+					$V_1 =2U_1 - 1, V_2 = 2 U_2 -1$; \\
+					until $W:=V_1^{2} + V_2^{2} < 1$.
+			\item $Z_1 := V_1\sqrt{-2\log(W)/W}$ \\
+					$Z_2 := V_2\sqrt{-2\log(W)/W}$ \\
+					are both normal variates.
+		\end{enumerate}
+	\end{quote}
+	\newpage
+	\section{Results}
+	\subsection{Part a}
+	\subsubsection{$N = 1,000$}
+	\begin{figure}[H]
+		\centering
+		\includegraphics[width=0.7\linewidth]{a_1000_10}
+		\caption{10 bins}	
+		\label{a_3_10}
+		\includegraphics[width=0.7\linewidth]{a_1000_20}
+		\caption{20 bins}	
+		\label{a_3_20}
+	\end{figure}
+	\newpage
+	\begin{figure}[H]
+		\centering
+		\includegraphics[width=0.75\linewidth]{a_1000_50}
+		\caption{50 bins}	
+		\label{a_3_50}
+		\centering
+		\includegraphics[width=0.75\linewidth]{a_1000_100}
+		\caption{100 bins}	
+		\label{a_3_100}
+	\end{figure}
+	\newpage
+	\subsubsection{$N = 1,000,000$}
+	\begin{figure}[H]
+		\centering
+		\includegraphics[width=0.75\linewidth]{a_1000000_10}
+		\caption{10 bins}	
+		\label{a_6_10}
+		\includegraphics[width=0.75\linewidth]{a_1000000_20}
+		\caption{20 bins}	
+		\label{a_6_20}
+	\end{figure}
+	\newpage
+	\begin{figure}[H]
+		\centering
+		\includegraphics[width=0.75\linewidth]{a_1000000_50}
+		\caption{50 bins}	
+		\label{a_6_50}
+		\includegraphics[width=0.75\linewidth]{a_1000000_100}
+		\caption{100 bins}	
+		\label{a_6_100}
+	\end{figure}
+	\subsection{Part b}
+	\subsubsection{$N = 1,000$}
+		\begin{figure}[H]
+		\centering
+		\includegraphics[width=0.7\linewidth]{b_1000_10}
+		\caption{10 bins}	
+		\label{b_3_10}
+		\includegraphics[width=0.7\linewidth]{b_1000_20}
+		\caption{20 bins}	
+		\label{b_3_20}
+	\end{figure}
+	\newpage
+	\begin{figure}[H]
+		\centering
+		\includegraphics[width=0.75\linewidth]{b_1000_50}
+		\caption{50 bins}	
+		\label{b_3_50}
+		\includegraphics[width=0.75\linewidth]{b_1000_100}
+		\caption{100 bins}	
+		\label{b_3_100}
+	\end{figure}
+	\subsubsection{$N = 1,000,000$}
+		\begin{figure}[H]
+		\centering
+		\includegraphics[width=0.7\linewidth]{b_1000000_10}
+		\caption{10 bins}	
+		\label{b_6_10}
+		\includegraphics[width=0.7\linewidth]{b_1000000_20}
+		\caption{20 bins}	
+		\label{b_6_20}
+	\end{figure}
+	\newpage
+	\begin{figure}[H]
+		\centering
+		\includegraphics[width=0.75\linewidth]{b_1000000_50}
+		\caption{50 bins}	
+		\label{b_6_50}
+		\includegraphics[width=0.75\linewidth]{b_1000000_100}
+		\caption{100 bins}	
+		\label{b_6_100}
+	\end{figure}
+	\newpage
+	\section{Discussion}
+		As can be seen from the above figures, the probability distribution of the generated random numbers always fluctuates around the distribution function, thus our results are reliable. And for a fixed number of subdivisions, the fluctuation of $1,000,000$ random numbers is smaller than that of $1,000$ random numbers. For a fixed number of random numbers, the fluctuation is more obvious as the number of subdivisions increases.
+\end{document}

@@ -1,0 +1,162 @@
+\documentclass[a4paper]{article}
+\usepackage{amsmath}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{float}
+\usepackage{multirow}
+\usepackage[english]{babel}
+\usepackage{array}
+\newcolumntype{P}[1]{>{\centering\arraybackslash}p{#1}}
+\newcolumntype{M}[1]{>{\centering\arraybackslash}m{#1}}
+\topmargin 0.0cm
+\newcommand*\chem[1]{\ensuremath{\mathrm{#1}}}
+\oddsidemargin 0.2cm
+\textwidth 16cm 
+\textheight 21cm
+\footskip 1.0cm
+\title{\textbf{PHY566 Homework \#2}}
+\author{Yuanyuan Xu}
+% \date{January 30, 2016}
+\begin{document}
+	\maketitle
+	\centerline{\emph{\Large{Carbon Dating}}}
+	\section{Problem Description}
+	Carbon dating is a method for determining the age of an ancient artifacts containing biological material by using the properties of radiocarbon \chem{^{14}_{6}C}. \chem{^{14}_{6}C} undergoes ${\beta}^{-}$ decay with a half-life time of $T_{\frac{1}{2}} = 5700$ ~years. Suppose an ancient artifact originally contained $10^{-12}$~kg of \chem{^{14}_{6}C}, calculate the activity of the sample, which defined as $R(t) = - \frac{dN}{dt}$, over a duration of $20,000$ ~years analytically and numerically and plot the results of numerical solution with different time-step widths and analytical solution. Then analyze the accuracy of the numerical solution with different time-step widths. 
+	
+	\section{Analytic Solution}
+	If $N(t)$ is the number of atoms left after time $t$ and $\tau$ is the decay constant, the equation governing the decay of a radioactive isotope is:
+	\begin{equation}  \label{ode}
+			\frac{dN}{dt} = - \frac{1}{\tau}N.
+	\end{equation}	
+	Then, we have
+	\begin{equation}
+		\frac{dN}{N} = -\frac{1}{\tau}dt.
+	\end{equation}
+	We then integrate both sides, obtaining
+	\begin{equation}
+		\int{\frac{dN}{dt}} = - \frac{1}{\tau}\int{dt}.
+	\end{equation}
+	Finally, we can get,
+	\begin{equation}
+		N(t) = N_0  e^{- \frac{t}{\tau}},
+	\end{equation}
+	where $N_0$ is the number of atoms of the isotope in the original sample.
+	
+	
+	Setting $N(t) = \frac{1}{2}N_0$, then we can get,
+	\begin{equation}
+		T_{\frac{1}{2}} = \tau \ln{2}.
+	\end{equation}
+	If we substitute $T_{\frac{1}{2}} = 5700$ years, then we have
+	\begin{equation}
+		\tau = \frac{5700}{\ln{2}} \textrm{~years} \approx 8223.36173 \textrm{~years.}
+	\end{equation}
+	
+	
+	if we define $R(t) = - \frac{dN}{dt}$ as the activity of the sample, then we have
+	\begin{align}
+		R(t) & = \frac{1}{\tau}N \label{R} \\
+			 & = \frac{1}{\tau} N_0 e^{-\frac{t}{\tau}} \\
+			 & = R_0 e^{-\frac{t}{\tau}}.
+	\end{align}
+
+	\section{Numerical Solution}
+	If we substitute \eqref{R} into \eqref{ode}, then we can get
+	\begin{equation} \label{oder}
+		\frac{dR}{dt} = - \frac{1}{\tau} R.
+	\end{equation}
+	
+	
+	From the definition of a derivative , we can obtain
+	\begin{equation}
+		\frac{dR}{dt	} = \lim_{\Delta t \to 0} \frac{R(t + \Delta t) - R(t)}{\Delta t} \approx \frac{R(t + \Delta t) - R(t)}{\Delta t}.
+	\end{equation}
+	We can rearrange this to obtain
+	\begin{equation} \label{derivative}
+		R(t + \Delta t) \approx R(t) + \frac{dR}{dt} \Delta t.
+	\end{equation}
+	If we insert \eqref{oder} into \eqref{derivative}, then we can get
+	\begin{equation}
+		R(t + \Delta t) \approx R(t) - \frac{R(t)}{\tau} \Delta t.
+	\end{equation}
+	And the initial value can be given by \eqref{R},
+	\begin{equation}
+		R(0) = \frac{N(0)}{\tau} = \frac{10^{-12}\mbox{kg}}{14\mbox{g/mol}} \frac{N_A}{\tau}.
+	\end{equation}
+	
+	
+	Figure~\ref{figure1} illustrates the results of analytical solution and numerical solution with time-step width of 10 years and 100 years. This figure also shows that the numerical results coincide well with the analytical result. Figure~\ref{figure2} shows the details around 2 half-lifes.
+	\begin{figure}[H]
+		\begin{subfigure}[b]{.5\textwidth}
+			\centering
+			\includegraphics[width=\linewidth]{figure_a}
+			\caption{Analytical result and numerical results}
+			\label{figure1}
+		\end{subfigure}
+		\begin{subfigure}[b]{.5\textwidth}
+			\centering
+			\includegraphics[width=\linewidth]{figure_a_zoomed}
+			\caption{Zoomed figure around 2 half-lifes}
+			\label{figure2}
+		\end{subfigure}
+		\caption{}
+	\end{figure}
+	
+	
+	If we increase the time-step width to 1,000 years, then the derivation from the analytical result becomes obvious which can be seen from the figure~\ref{figure3}.
+	\begin{figure}[H]
+		\begin{subfigure}[b]{.5\textwidth}
+			\centering
+			\includegraphics[width=\linewidth]{figure_b}
+			\caption{Analytical result and numerical results}
+			\label{figure3}
+		\end{subfigure}
+		\begin{subfigure}[b]{.5\textwidth}
+			\centering
+			\includegraphics[width=\linewidth]{figure_b_zoomed}
+			\caption{Zoomed figure around 12,000th year}
+			\label{figure4}
+		\end{subfigure}
+		\caption{}
+	\end{figure}
+	
+	\section{Discussion}
+	The following table shows the results and percent errors we get from analytical solution and numerical solutions of different time-step widths. 
+	\begin{center}
+		\begin{tabular}{|P{2cm}|P{3cm}|P{3.5cm}|P{3cm}|}
+		\hline
+		\multicolumn{2}{|c|}{Type} & R(12,000) & Percent Error\\ \hline
+		\multicolumn{2}{|c|}{Analytical Solution} & 1,215,670,733.832559 & - \\ \hline
+		\multirow{3}{*}{\parbox{2cm}{Numerical Solution}} & 10 years & 1,214,591,717.858181 & 0.088759\% \\ \cline{2-4}
+		& 100 years & 1,204,844,778.564423 & 0.890534\% \\ \cline{2-4}
+		& 1,000 years & 1,103,679,445.553761 & 9.212304\% \\ \hline
+		\end{tabular}
+	\end{center}
+	
+	
+	It can be seen from the table that the result is not acceptable when time-step width is 1,000 years because the corresponding percent error is too big ($9.212304\%$).
+	
+	The Taylor expansion for $R(t)$ is 
+	\begin{equation}
+		R(\Delta t) = R(0) + \frac{dR}{dt} \Delta t + \frac{1}{2	}\frac{d^2R}{dt^2}(\Delta t)^2 + \dots.
+	\end{equation}
+	If we consider the second-order term, then the error is
+	\begin{align}
+		\Delta R &= \frac{1}{2}\frac{d^2R}{dt^2}(\Delta t)^2 \\
+		 & = \frac{1}{2}\frac{1}{{\tau}^2} R_0 e^{- \frac{t}{\tau}} (\Delta t)^2\\
+		 & = \frac{1}{2{\tau}^2}R(t)(\Delta t)^2.
+	\end{align}
+	Hence, the percent error is
+	\begin{equation}
+			\eta = \frac{\Delta R}{R} = \frac{1}{2{\tau}^2}(\Delta t)^2.
+	\end{equation}
+	If we set $\Delta t = 1,000$, we can obtain
+	\begin{equation}
+		\eta \approx 0.00739386 = 0.739386\%,
+	\end{equation}
+	which means that the error from the second order term accounts for only a small fraction of the total errors of the result with time-step with of 1,000 years.
+
+
+\end{document}
